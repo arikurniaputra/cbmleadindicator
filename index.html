@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CBM Leading Indicator 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap" rel="stylesheet">
 <style>
   :root{
     --blue:#1c9ad6;
@@ -86,7 +89,7 @@
     color:var(--muted);font-size:12px;letter-spacing:2px;
     text-transform:uppercase;margin-bottom:14px;
   }
-  .numbox .val{color:var(--blue);font-size:54px;font-weight:300;line-height:1;}
+  .numbox .val{color:var(--blue);font-family:'Montserrat',sans-serif;font-weight:800;font-size:54px;line-height:1;}
 
   /* donut */
   .donut-wrap{position:relative;width:170px;height:170px;}
@@ -286,18 +289,12 @@ function donutCard(title,achieved,remaining){
   const a=isNaN(achieved)?0:achieved;
   const rem=isNaN(remaining)?(1-a):remaining;
   const total=a+rem || 1;
-  const aFrac=a/total;
-  const rFrac=rem/total;
+  const aFrac=Math.max(0,Math.min(1,a/total));
 
-  const r=42, C=2*Math.PI*r, gapPx=4;
-  const aLen=Math.max(0,aFrac*C-gapPx);
-  const rLen=Math.max(0,rFrac*C-gapPx);
-  // start angles (deg). top = -90.
-  const aStart=-90 + (gapPx/2)/C*360;
-  const rStart=-90 + (gapPx/2 + aFrac*C + gapPx/2)/C*360;
-
-  const pct = Math.round(aFrac*100);
-  const remPct = 100-pct;
+  const r=42, C=2*Math.PI*r;
+  const aLen=aFrac*C;
+  const pct=Math.round(aFrac*100);
+  const remPct=100-pct;
 
   const el=document.createElement("div");
   el.className="card";
@@ -305,12 +302,10 @@ function donutCard(title,achieved,remaining){
     <h3>${escapeHTML(title)}</h3>
     <div class="donut-wrap">
       <svg viewBox="0 0 100 100">
-        <circle cx="50" cy="50" r="${r}" fill="none" stroke="var(--ring-bg)"
-                stroke-width="11" stroke-dasharray="${rLen} ${C}" stroke-linecap="butt"
-                transform="rotate(${rStart} 50 50)"/>
+        <circle cx="50" cy="50" r="${r}" fill="none" stroke="var(--ring-bg)" stroke-width="11"/>
         <circle cx="50" cy="50" r="${r}" fill="none" stroke="var(--blue)"
                 stroke-width="11" stroke-dasharray="${aLen} ${C}" stroke-linecap="butt"
-                transform="rotate(${aStart} 50 50)"/>
+                transform="rotate(-90 50 50)"/>
       </svg>
       <div class="donut-center">
         <div class="c-lbl">Achieved</div>
