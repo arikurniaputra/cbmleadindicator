@@ -178,7 +178,6 @@ function parseCSV(text){
     field+=c;i++;
   }
   row.push(field);rows.push(row);
-  // drop fully empty trailing rows
   return rows.filter(r=>r.some(x=>String(x).trim()!==""));
 }
 
@@ -197,13 +196,11 @@ function renderTable(rows){
   const header=rows[0];
   const body=rows.slice(1);
 
-  // identify week columns = columns after the fixed ones whose header is a number
   const weekIdx=[];
   for(let c=FIXED_COLS;c<header.length;c++){
     if(String(header[c]).trim()!=="" && !isNaN(parseFloat(header[c]))) weekIdx.push(c);
   }
 
-  // find the last week column that actually has data in any body row
   let lastFilled=-1;
   weekIdx.forEach((c,pos)=>{
     const has=body.some(r=>r[c]!==undefined && String(r[c]).trim()!=="");
@@ -245,7 +242,6 @@ function renderCards(rows){
   const si=header.indexOf("status");
   const vi=header.indexOf("value");
 
-  // group by metric, preserve order
   const order=[]; const groups={};
   rows.slice(1).forEach(r=>{
     const m=(r[mi]||"").trim(); if(!m) return;
@@ -256,7 +252,6 @@ function renderCards(rows){
   host.innerHTML="";
   order.forEach(metric=>{
     const g=groups[metric];
-    const hasRemaining = ("remaining" in g) || ((g.achieved!==undefined)&&(g.achieved<=1.0001 && g.achieved>=0 && Object.keys(g).length>1));
     if("remaining" in g){
       host.appendChild(donutCard(metric,g.achieved,g.remaining));
     } else {
@@ -292,7 +287,6 @@ function donutCard(title,achieved,remaining){
   const r=42, C=2*Math.PI*r, gapPx=4;
   const aLen=Math.max(0,aFrac*C-gapPx);
   const rLen=Math.max(0,rFrac*C-gapPx);
-  // start angles (deg). top = -90.
   const aStart=-90 + (gapPx/2)/C*360;
   const rStart=-90 + (gapPx/2 + aFrac*C + gapPx/2)/C*360;
 
