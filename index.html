@@ -101,6 +101,20 @@
   .legend span{display:flex;align-items:center;gap:6px;}
   .dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
 
+  .head-right{display:flex;align-items:center;gap:12px;}
+  .refresh-btn{
+    display:inline-flex;align-items:center;gap:7px;
+    background:var(--blue);color:#fff;border:none;cursor:pointer;
+    font:inherit;font-size:13px;font-weight:600;
+    padding:8px 14px;border-radius:8px;line-height:1;
+    transition:background .15s ease,opacity .15s ease;
+  }
+  .refresh-btn:hover{background:var(--blue-dark);}
+  .refresh-btn:disabled{opacity:.6;cursor:default;}
+  .refresh-btn svg{width:15px;height:15px;}
+  .refresh-btn.loading svg{animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
   .state{
     text-align:center;color:var(--muted);font-size:14px;padding:30px;
   }
@@ -115,7 +129,15 @@
 <div class="wrap">
   <div class="header">
     <div class="title">CBM Leading Indicator 2026</div>
-    <div class="updated" id="updated"></div>
+    <div class="head-right">
+      <div class="updated" id="updated"></div>
+      <button class="refresh-btn" id="refreshBtn" type="button" title="Refresh now">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/>
+        </svg>
+        <span>Refresh</span>
+      </button>
+    </div>
   </div>
 
   <div class="table-card">
@@ -312,6 +334,8 @@ function stamp(){
 }
 
 async function load(){
+  const btn=document.getElementById("refreshBtn");
+  if(btn){btn.disabled=true;btn.classList.add("loading");}
   try{
     const [t,b]=await Promise.all([fetchCSV(TABLE_CSV),fetchCSV(BOTTOM_CSV)]);
     renderTable(t);
@@ -321,9 +345,12 @@ async function load(){
     document.getElementById("tableHost").innerHTML=
       '<div class="state err">Could not load data. Check the sheet is published. ('+escapeHTML(e.message)+')</div>';
     document.getElementById("cardsHost").innerHTML="";
+  }finally{
+    if(btn){btn.disabled=false;btn.classList.remove("loading");}
   }
 }
 
+document.getElementById("refreshBtn").addEventListener("click",load);
 load();
 setInterval(load,REFRESH_MS);
 </script>
